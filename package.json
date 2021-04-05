@@ -1,0 +1,25 @@
+{
+  "name": "ccdc",
+  "version": "1.0.0",
+  "description": "",
+  "main": "bin/ccdc.js",
+  "bin": {
+    "ccdc": "bin/ccdc.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "nixalio@gmail.com",
+  "license": "MIT",
+  "dependencies": {
+    "bunyan": "^1.8.15",
+    "cheerio": "*",
+    "config": "^3.3.6",
+    "got": "^11.8.2",
+    "js-yaml": "^4.0.0",
+    "limiter": "^1.1.5",
+    "lodash": "^4.17.21",
+    "sqlite3": "^5.0.2",
+    "yargs": "^16.2.0"
+  }
+}
