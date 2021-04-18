@@ -49,7 +49,8 @@ function createTables(db) {
                 id           text primary key not null,
                 url          text not null,
                 name         text not null,
-                contact_name text not null
+                contact_name text not null,
+                region       text not null
             );
         `,
         `

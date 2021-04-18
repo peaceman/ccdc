@@ -41,6 +41,7 @@ async function scrapeObject(objectId, objectUrl) {
         id: objectId,
         url: objectUrl,
         name: $('div.expose__headline').text(),
+        region: extractRegion($),
         contact: {
             name: $('div.expose-section__content p.h3').text(),
             phoneNumbers: extractPhoneNumbers($),
@@ -53,6 +54,15 @@ async function scrapeObject(objectId, objectUrl) {
     } else {
         return object;
     }
+}
+
+function extractRegion($) {
+    let breadcrumbs = [];
+    $('.expose-breadcrumbs li > a > span').each(function () {
+        breadcrumbs.push($(this).text());
+    });
+
+    return breadcrumbs.map(v => v.trim()).join(' / ');
 }
 
 function extractPhoneNumbers($) {
@@ -79,8 +89,8 @@ function objectIsStored(db, objectId) {
 function storeObject(db, object) {
     db.serialize(() => {
         db.run(
-            'insert into objects (id, url, name, contact_name) values (?, ?, ?, ?)',
-            [object.id, object.url, object.name, object.contact.name]
+            'insert into objects (id, url, name, contact_name, region) values (?, ?, ?, ?, ?)',
+            [object.id, object.url, object.name, object.contact.name, object.region]
         );
 
         for (const phoneNumber of object.contact.phoneNumbers) {
