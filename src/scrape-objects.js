@@ -42,6 +42,7 @@ async function scrapeObject(objectId, objectUrl) {
         url: objectUrl,
         name: $('div.expose__headline').text(),
         region: extractRegion($),
+        coords: extractCoords($),
         contact: {
             name: $('div.expose-section__content p.h3').text(),
             phoneNumbers: extractPhoneNumbers($),
@@ -63,6 +64,37 @@ function extractRegion($) {
     });
 
     return breadcrumbs.map(v => v.trim()).join(' / ');
+}
+
+function extractCoords($) {
+    let json = $('div[data-module="exposeLocation"] script[type="text/x-config"]')
+        ?.[0]
+        ?.children
+        ?.[0]
+        ?.data
+        ?? '';
+
+    json = json.trim();
+
+    if (json.length === 0) {
+        return undefined;
+    }
+
+    try {
+        const data = JSON.parse(json);
+
+        const coords = {
+            latitude: data?.listing?.lat,
+            longitude: data?.listing?.lng,
+        };
+
+        return (coords.latitude === undefined || coords.longitude === undefined)
+                ? undefined
+                : coords;
+    } catch (e) {
+        log.error('failed to parse coords json', {e});
+        return undefined;
+    }
 }
 
 function extractPhoneNumbers($) {
@@ -89,8 +121,26 @@ function objectIsStored(db, objectId) {
 function storeObject(db, object) {
     db.serialize(() => {
         db.run(
-            'insert into objects (id, url, name, contact_name, region) values (?, ?, ?, ?, ?)',
-            [object.id, object.url, object.name, object.contact.name, object.region]
+            `insert into objects (
+                id,
+                url,
+                name,
+                contact_name,
+                region,
+                latitude,
+                longitude
+            ) values (
+                ?, ?, ?, ?, ?, ?, ?
+            )`,
+            [
+                object.id,
+                object.url,
+                object.name,
+                object.contact.name,
+                object.region,
+                object.coords.latitude,
+                object.coords.longitude,
+            ]
         );
 
         for (const phoneNumber of object.contact.phoneNumbers) {

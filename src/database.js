@@ -50,7 +50,9 @@ function createTables(db) {
                 url          text not null,
                 name         text not null,
                 contact_name text not null,
-                region       text not null
+                region       text not null,
+                latitude     number null,
+                longitude    number null
             );
         `,
         `
