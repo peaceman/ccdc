@@ -32,7 +32,15 @@ async function handler(args) {
 
 async function scrapeObject(objectId, objectUrl) {
     log.info('scraping object', {url: objectUrl});
-    const response = await request(objectUrl);
+
+    let response = undefined;
+    try {
+        response  = await request(objectUrl);
+    } catch (e) {
+        log.error('object request failed', {objectId, objectUrl});
+        return undefined;
+    }
+
     log.info('got response', {objectUrl, duration: response.timings.phases.total});
 
     const $ = cheerio.load(response.body);
